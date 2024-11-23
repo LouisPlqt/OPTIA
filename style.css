@@ -23,17 +23,19 @@ body {
     align-items: center;
     justify-content: center;
     background-color: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
+    padding: 30px;
+    border-radius: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.8); /* Ombre autour du formulaire */
     margin-bottom: 30px;
     width: 100%;
     max-width: 600px;
+    
 }
+
 
 /* Espacement entre les champs de recherche */
 .search-container label, .search-container input {
-    margin-bottom: 15px; /* Ajoute un espacement vertical entre les champs */
+    margin-bottom: 20px; /* Ajoute un espacement vertical entre les champs */
 }
 
 .search-input {
@@ -45,6 +47,7 @@ body {
     color: white;
     width: 100%;
     box-sizing: border-box;
+    margin-top: 10px;
 }
 
 .search-input:focus {
@@ -64,6 +67,7 @@ body {
     cursor: pointer;
     width: 100%;
     box-sizing: border-box;
+    margin-top: 20px;
 }
 
 .search-button:hover {
