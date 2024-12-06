@@ -33,21 +33,24 @@
         }
 
         // Fonction pour récupérer la tâche associée au modèle
-        function fetchTaskForModel(modelName) {
-            fetch(`get_task_for_model.php?model=${modelName}`)
-                .then(response => response.json())
-                .then(data => {
-                    const taskField = document.getElementById('tache');
-                    if (data && data.task) {
-                        // Remplir la case "Tâche" avec la tâche correspondante
-                        taskField.value = data.task;
-                    } else {
-                        // Laisser la case "Tâche" vide si aucune tâche n'est trouvée
-                        taskField.value = '';
-                    }
-                })
-                .catch(error => console.error('Erreur lors de la récupération de la tâche :', error));
-        }
+       // Fonction pour récupérer la tâche associée au modèle
+       function fetchTaskForModel(modelName) {
+    fetch(`get_task_for_model.php?model=${modelName}`)
+        .then(response => response.json())
+        .then(data => {
+            const taskField = document.getElementById('tache');
+            if (data.taskId) {
+                // Sélectionner automatiquement la tâche correspondante dans le menu déroulant
+                taskField.value = data.taskId;
+            } else {
+                // Réinitialiser si aucune tâche trouvée
+                taskField.value = '';
+            }
+        })
+        .catch(error => console.error('Erreur lors de la récupération de la tâche :', error));
+}
+
+
     </script>
 </head>
 <body>
@@ -81,13 +84,17 @@
             
             <div class="form-group">
                 <label for="tache">Tâche :</label>
-                <input type="text" name="tache" id="tache" list="tache_list" 
-                       placeholder="Entrez une tâche..." class="search-input"
-                       oninput="fetchSuggestions('tache')">
-                <datalist id="tache_list"></datalist>
+                <!-- Modification : Utilisation d'un menu déroulant -->
+                <select name="tache" id="tache" class="search-input">
+                    <option value="">Choisissez une tâche</option> <!-- Option par défaut -->
+                    <option value="1">Détection</option>         <!-- idTache = 1 -->
+                    <option value="2">Segmentation</option>      <!-- idTache = 2 -->
+                    <option value="3">Classification</option>    <!-- idTache = 3 -->
+                </select>
             </div>
-            
+            <div>
             <button type="submit" class="search-button">Rechercher</button>
+        </div>
         </form>
     </div>
 </body>
