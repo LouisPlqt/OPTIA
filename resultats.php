@@ -7,7 +7,7 @@ try {
     $conn = new PDO('mysql:host=143.47.179.70;port=443;dbname=db1', 'user1', 'user1');
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("<div class='error'>Erreur de connexion : " . htmlspecialchars($e->getMessage()) . "</div>");
+    die("Erreur de connexion : " . $e->getMessage());
 }
 
 // Récupération des critères de recherche
@@ -42,7 +42,7 @@ if (count($conditions) > 0) {
             LEFT JOIN ressourceutilisée r ON cr.idRessource = r.idRessource
             WHERE " . implode(' AND ', $conditions);
 } else {
-    die("<div class='error'>Veuillez renseigner au moins un critère de recherche.</div>");
+    die("<p>Veuillez renseigner au moins un critère de recherche.</p>");
 }
 
 $stmt = $conn->prepare($sql);
@@ -51,7 +51,7 @@ try {
     $stmt->execute($params);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("<div class='error'>Erreur lors de l'exécution de la requête : " . htmlspecialchars($e->getMessage()) . "</div>");
+    die("Erreur lors de l'exécution de la requête : " . $e->getMessage());
 }
 
 ?>
@@ -65,34 +65,26 @@ try {
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
-        font-family: Arial, sans-serif;
-        background-color: #121212;
-        color: #ffffff;
-        margin: 0;
-        padding: 0;
+            background-color: #121212; /* Fond sombre */
+            color: #ffffff; /* Texte blanc */
+            font-family: 'Roboto', sans-serif;
         }
 
         .container {
-        width: 80%;
-        margin: auto;
-        padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        h1, h2 {
-    text-align: center; 
-    color:rgb(255, 255, 255);
-}
+        h1, h2, h3 {
+            color:rgb(255, 255, 255); /* Titre de couleur verte */
+        }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    background-color: #1e1e1e;
-    color: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
-}
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
 
         th, td {
             padding: 12px;
@@ -167,97 +159,10 @@ table {
             if (!empty($tache) && empty($modele) && empty($ressource)) {
                 echo "<h2>Tâche recherchée : " . htmlspecialchars($tache) . "</h2>";
                 echo "<h3>Voici les modèles et les ressources associés à cette tâche :</h3>";
-            }}
-?>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Résultats de la recherche</title>
-    <style>
-        body {
-            background-color: #121212;
-            color: #f5f5f5;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        h2, h3 {
-            color: #4CAF50;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        table, th, td {
-            border: 1px solid #4CAF50;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #2e2e2e;
-        }
-        a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .error {
-            color: red;
-            font-weight: bold;
-        }
-        .button {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        .button:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body>
-<?php
-if (count($results) > 0) {
-    echo "<h2>Résultats de la recherche :</h2>";
-
-    // Affichage des messages spécifiques selon les critères
-    if (!empty($modele) && empty($ressource)) {
-        echo "<h3>Modèle recherché : " . htmlspecialchars($modele) . "</h3>";
-        echo "<h3>Voici les ressources capables de faire tourner le modèle :</h3>";
-    } elseif (!empty($ressource) && empty($modele) && empty($tache)) {
-        echo "<h3>Ressource recherchée : " . htmlspecialchars($ressource) . "</h3>";
-        echo "<h3>Voici les modèles pouvant être exécutés sur cette ressource :</h3>";
-    } elseif (!empty($ressource) && !empty($tache) && empty($modele)) {
-        echo "<h3>Ressource recherchée : " . htmlspecialchars($ressource) . "</h3>";
-        echo "<h3>Tâche recherchée : " . htmlspecialchars($tache) . "</h3>";
-        echo "<h3>Voici les modèles compatibles :</h3>";
-    } elseif (!empty($tache) && empty($modele) && empty($ressource)) {
-        echo "<h3>Tâche recherchée : " . htmlspecialchars($tache) . "</h3>";
-        echo "<h3>Voici les modèles et ressources associés :</h3>";
-    }
+            }
 
             echo "<table>";
             echo "<tr>";
-    echo "<table>";
-    echo "<tr>";
 
             if ($modele === '') {
                 echo "<th>Modèle</th>";
@@ -290,22 +195,6 @@ if (count($results) > 0) {
                 echo "<td>" . htmlspecialchars($result['Mémoire']) . "</td>";
                 echo "</tr>";
             }
-    foreach ($results as $result) {
-        echo "<tr>";
-        if ($modele === '') {
-            echo "<td><a href='details.php?id=" . htmlspecialchars($result['IdModeleIA']) . "'>" . htmlspecialchars($result['Modele']) . "</a></td>";
-        }
-        if ($ressource === '') {
-            echo "<td><a href='details.php?id=" . htmlspecialchars($result['idRessource']) . "'>" . htmlspecialchars($result['Ressource']) . "</a></td>";
-        }
-        if ($tache === '') {
-            echo "<td>" . htmlspecialchars($result['Tache']) . "</td>";
-        }
-        echo "<td>" . htmlspecialchars($result['CPU']) . "</td>";
-        echo "<td>" . htmlspecialchars($result['GPU']) . "</td>";
-        echo "<td>" . htmlspecialchars($result['Mémoire']) . "</td>";
-        echo "</tr>";
-    }
 
             echo "</table>";
         } else {
@@ -316,12 +205,5 @@ if (count($results) > 0) {
         <button class="btn-return" onclick="window.history.back();">Retour</button>
     </div>
 
-</body>
-    echo "</table>";
-} else {
-    echo "<div class='error'>Aucun résultat trouvé pour les critères spécifiés.</div>";
-}
-?>
-<button class="button" onclick="window.history.back();">Retour</button>
 </body>
 </html>
