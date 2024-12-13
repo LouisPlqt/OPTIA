@@ -167,7 +167,7 @@ table {
             if (!empty($tache) && empty($modele) && empty($ressource)) {
                 echo "<h2>Tâche recherchée : " . htmlspecialchars($tache) . "</h2>";
                 echo "<h3>Voici les modèles et les ressources associés à cette tâche :</h3>";
-            }
+            }}
 ?>
 <!DOCTYPE html>
 <html>
