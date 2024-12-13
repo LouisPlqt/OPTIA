@@ -122,8 +122,12 @@ if (count($results) > 0) {
 } else {
     echo "<p>Aucun résultat trouvé pour les critères spécifiés.</p>";
 }
-?>
+// Bouton retour en haut à droite
+echo "<button onclick='window.history.back();' style='position: fixed; top: 10px; right: 10px; background-color: #444; color: white; border: none; padding: 10px 20px; cursor: pointer;'>Retour</button>";
 
+?>
+<!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -136,3 +140,4 @@ if (count($results) > 0) {
         }
     </style>
 </head>
+</html>

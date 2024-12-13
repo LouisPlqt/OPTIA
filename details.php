@@ -21,6 +21,9 @@ if (isset($_GET['id'])) {
     $modele = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($modele) {
+        // Bouton retour en haut à droite
+        echo "<button onclick='window.history.back();' style='position: absolute; top: 10px; right: 10px; background-color: #444; color: white; border: none; padding: 10px 20px; cursor: pointer;'>Retour</button>";
+
         echo "<h2>Détails du Modèle</h2>";
         echo "<p><strong>Nom :</strong> " . htmlspecialchars($modele['Nom']) . "</p>";
 
@@ -176,6 +179,17 @@ if (isset($_GET['id'])) {
             border: 2px solid white; /* Bordure blanche */
             width: 60%;
             height: 300px;
+        }
+        button {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #666;
         }
     </style>
 </head>
