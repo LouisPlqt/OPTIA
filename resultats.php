@@ -19,7 +19,6 @@ $tache = isset($_GET['tache']) ? trim($_GET['tache']) : '';
 $conditions = [];
 $params = [];
 
-// Ajout de conditions dynamiques
 if ($modele !== '') {
     $conditions[] = "m.Nom LIKE :modele";
     $params[':modele'] = '%' . $modele . '%';
@@ -35,9 +34,8 @@ if ($tache !== '') {
     $params[':tache'] = '%' . $tache . '%';
 }
 
-// Vérification qu'au moins un critère est renseigné
 if (count($conditions) > 0) {
-    $sql = "SELECT m.Nom AS Modele, r.Nom AS Ressource, t.Nom AS Tache, r.CPU, r.GPU, r.Mémoire
+    $sql = "SELECT m.IdModeleIA, m.Nom AS Modele, r.idRessource, r.Nom AS Ressource, t.Nom AS Tache, r.CPU, r.GPU, r.Mémoire
             FROM modeleia m
             LEFT JOIN tache t ON m.id_tache = t.id_tache
             LEFT JOIN classressource cr ON m.IdModeleIA = cr.idModeleIA
@@ -47,7 +45,6 @@ if (count($conditions) > 0) {
     die("<p>Veuillez renseigner au moins un critère de recherche.</p>");
 }
 
-// Préparation et exécution de la requête
 $stmt = $conn->prepare($sql);
 
 try {
@@ -61,28 +58,34 @@ try {
 if (count($results) > 0) {
     echo "<h2>Résultats de la recherche :</h2>";
 
-    // Affichage d'un titre spécifique selon le critère de recherche
-    if ($modele !== '') {
-        echo "<h3>Modèle recherché : " . htmlspecialchars($modele);
-        // Afficher la tâche entre parenthèses à côté du modèle
-        if (!empty($results[0]['Tache'])) {
-            echo " (" . htmlspecialchars($results[0]['Tache']) . ")";
-        }
-        echo "</h3>";
+    // Afficher un titre spécifique si la recherche est uniquement par modèle
+    if (!empty($modele) && empty($ressource)) {
+        echo "<h3>Modèle recherché : " . htmlspecialchars($modele) . "</h3>";
         echo "<h3>Voici les ressources capables de faire tourner le modèle :</h3>";
-    } elseif ($ressource !== '') {
-        echo "<h3>Ressource recherchée : " . htmlspecialchars($ressource) . "</h3>";
-        echo "<h3>Voici les modèles qui peuvent être exécutés sur cette ressource :</h3>";
-    } elseif ($tache !== '') {
-        echo "<h3>Tâche recherchée : " . htmlspecialchars($tache) . "</h3>";
-        echo "<h3>Voici les modèles et ressources associés à cette tâche :</h3>";
     }
 
-    // Début du tableau
+    // Afficher un titre spécifique si la recherche est uniquement par ressource
+    if (!empty($ressource) && empty($modele) && empty($tache)) {
+        echo "<h3>Ressource recherchée : " . htmlspecialchars($ressource) . "</h3>";
+        echo "<h3>Voici les modèles pouvant être exécutés sur la ressource entrée :</h3>";
+    }
+
+    // Afficher un titre spécifique si la recherche combine ressource et tâche
+    if (!empty($ressource) && !empty($tache) && empty($modele)) {
+        echo "<h3>Ressource recherchée : " . htmlspecialchars($ressource) . "</h3>";
+        echo "<h3>Tâche recherchée : " . htmlspecialchars($tache) . "</h3>";
+        echo "<h3>Voici les modèles compatibles avec la tâche et la ressource spécifiées :</h3>";
+    }
+
+    // Afficher un titre spécifique si la recherche est uniquement par tâche
+    if (!empty($tache) && empty($modele) && empty($ressource)) {
+        echo "<h3>Tâche recherchée : " . htmlspecialchars($tache) . "</h3>";
+        echo "<h3>Voici les modèles et les ressources associés à cette tâche :</h3>";
+    }
+
     echo "<table border='1'>";
     echo "<tr>";
 
-    // Ajouter dynamiquement les colonnes selon les critères non spécifiés
     if ($modele === '') {
         echo "<th>Modèle</th>";
     }
@@ -93,18 +96,18 @@ if (count($results) > 0) {
         echo "<th>Tâche</th>";
     }
 
-    // Colonnes fixes pour les caractéristiques
     echo "<th>CPU</th><th>GPU</th><th>Mémoire</th>";
     echo "</tr>";
 
-    // Affichage des lignes
     foreach ($results as $result) {
         echo "<tr>";
         if ($modele === '') {
-            echo "<td>" . htmlspecialchars($result['Modele']) . "</td>";
+            // Lien vers la page détails pour le modèle
+            echo "<td><a href='details.php?id=" . htmlspecialchars($result['IdModeleIA']) . "'>" . htmlspecialchars($result['Modele']) . "</a></td>";
         }
         if ($ressource === '') {
-            echo "<td>" . htmlspecialchars($result['Ressource']) . "</td>";
+            // Lien vers la page détails pour la ressource
+            echo "<td><a href='details.php?id=" . htmlspecialchars($result['idRessource']) . "'>" . htmlspecialchars($result['Ressource']) . "</a></td>";
         }
         if ($tache === '') {
             echo "<td>" . htmlspecialchars($result['Tache']) . "</td>";
@@ -120,9 +123,17 @@ if (count($results) > 0) {
     echo "<p>Aucun résultat trouvé pour les critères spécifiés.</p>";
 }
 ?>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détails de la Ressource</title>
+    <title>Résultats de la recherche</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: black; /* Fond noir */
+            color: white; /* Texte en blanc */
+        }
+    </style>
 </head>
+
