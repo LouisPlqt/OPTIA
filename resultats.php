@@ -58,17 +58,29 @@ try {
 if (count($results) > 0) {
     echo "<h2>Résultats de la recherche :</h2>";
 
-    // Afficher un titre spécifique en fonction des critères
+    // Afficher un titre spécifique si la recherche est uniquement par modèle
     if (!empty($modele) && empty($ressource)) {
         echo "<h3>Modèle recherché : " . htmlspecialchars($modele) . "</h3>";
+        echo "<h3>Voici les ressources capables de faire tourner le modèle :</h3>";
     }
 
+    // Afficher un titre spécifique si la recherche est uniquement par ressource
     if (!empty($ressource) && empty($modele) && empty($tache)) {
         echo "<h3>Ressource recherchée : " . htmlspecialchars($ressource) . "</h3>";
+        echo "<h3>Voici les modèles pouvant être exécutés sur la ressource entrée :</h3>";
     }
 
+    // Afficher un titre spécifique si la recherche combine ressource et tâche
     if (!empty($ressource) && !empty($tache) && empty($modele)) {
-        echo "<h3>Ressource : " . htmlspecialchars($ressource) . " - Tâche : " . htmlspecialchars($tache) . "</h3>";
+        echo "<h3>Ressource recherchée : " . htmlspecialchars($ressource) . "</h3>";
+        echo "<h3>Tâche recherchée : " . htmlspecialchars($tache) . "</h3>";
+        echo "<h3>Voici les modèles compatibles avec la tâche et la ressource spécifiées :</h3>";
+    }
+
+    // Afficher un titre spécifique si la recherche est uniquement par tâche
+    if (!empty($tache) && empty($modele) && empty($ressource)) {
+        echo "<h3>Tâche recherchée : " . htmlspecialchars($tache) . "</h3>";
+        echo "<h3>Voici les modèles et les ressources associés à cette tâche :</h3>";
     }
 
     echo "<table border='1'>";
@@ -90,9 +102,11 @@ if (count($results) > 0) {
     foreach ($results as $result) {
         echo "<tr>";
         if ($modele === '') {
+            // Lien vers la page détails pour le modèle
             echo "<td><a href='details.php?id=" . htmlspecialchars($result['IdModeleIA']) . "'>" . htmlspecialchars($result['Modele']) . "</a></td>";
         }
         if ($ressource === '') {
+            // Lien vers la page détails pour la ressource
             echo "<td><a href='details.php?id=" . htmlspecialchars($result['idRessource']) . "'>" . htmlspecialchars($result['Ressource']) . "</a></td>";
         }
         if ($tache === '') {
@@ -108,12 +122,8 @@ if (count($results) > 0) {
 } else {
     echo "<p>Aucun résultat trouvé pour les critères spécifiés.</p>";
 }
-
-// Bouton retour
-echo "<button onclick='window.history.back();'>Retour</button>";
 ?>
-<!DOCTYPE html>
-<html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -126,4 +136,3 @@ echo "<button onclick='window.history.back();'>Retour</button>";
         }
     </style>
 </head>
-</html>
