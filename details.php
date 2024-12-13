@@ -21,9 +21,10 @@ if (isset($_GET['id'])) {
     $modele = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($modele) {
-        // Bouton retour en haut à droite
-        echo "<button onclick='window.history.back();' style='position: absolute; top: 10px; right: 10px; background-color: #444; color: white; border: none; padding: 10px 20px; cursor: pointer;'>Retour</button>";
+       // Bouton retour en haut à droite
+        echo "<button onclick='window.history.back();' style='position: fixed; top: 10px; right: 10px; background-color: #444; color: white; border: none; padding: 10px 20px; cursor: pointer;'>Retour</button>";
 
+        echo "<div class='container'>";
         echo "<h2>Détails du Modèle</h2>";
         echo "<p><strong>Nom :</strong> " . htmlspecialchars($modele['Nom']) . "</p>";
 
@@ -51,14 +52,14 @@ if (isset($_GET['id'])) {
         // Afficher les détails des performances avant
         if (!empty($perfBefore)) {
             echo "<h3>Performances Avant</h3>";
-            echo "<table border='1'>";
-            echo "<tr>";
+            echo "<table>";
+            echo "<thead><tr>";
             foreach (array_keys($perfBefore[0]) as $column) {
                 if (!in_array($column, ['idPerfBefore', 'idRessource'])) { // Exclure les ID
                     echo "<th>" . htmlspecialchars($column) . "</th>";
                 }
             }
-            echo "</tr>";
+            echo "</tr></thead><tbody>";
             foreach ($perfBefore as $row) {
                 echo "<tr>";
                 foreach ($row as $key => $value) {
@@ -68,7 +69,7 @@ if (isset($_GET['id'])) {
                 }
                 echo "</tr>";
             }
-            echo "</table>";
+            echo "</tbody></table>";
         }
 
         echo "<div class='spacer'></div>";
@@ -76,14 +77,14 @@ if (isset($_GET['id'])) {
         // Afficher les détails des performances après
         if (!empty($perfAfter)) {
             echo "<h3>Performances Après</h3>";
-            echo "<table border='1'>";
-            echo "<tr>";
+            echo "<table>";
+            echo "<thead><tr>";
             foreach (array_keys($perfAfter[0]) as $column) {
                 if (!in_array($column, ['idPerfAfter', 'idModeleIA'])) { // Exclure les ID
                     echo "<th>" . htmlspecialchars($column) . "</th>";
                 }
             }
-            echo "</tr>";
+            echo "</tr></thead><tbody>";
             foreach ($perfAfter as $row) {
                 echo "<tr>";
                 foreach ($row as $key => $value) {
@@ -93,7 +94,7 @@ if (isset($_GET['id'])) {
                 }
                 echo "</tr>";
             }
-            echo "</table>";
+            echo "</tbody></table>";
         }
 
         echo "<div class='spacer'></div>";
@@ -136,6 +137,8 @@ if (isset($_GET['id'])) {
             </script>
             ";
         }
+
+        echo "</div>";
     } else {
         echo "<p>Aucun modèle trouvé avec cet ID.</p>";
     }
@@ -144,52 +147,15 @@ if (isset($_GET['id'])) {
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Détails du Modèle</title>
-    <style>
-        body {
-            background-color: black; /* Fond noir */
-            color: white; /* Texte en blanc */
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 20px 0;
-            color: white;
-        }
-        th, td {
-            border: 1px solid #444;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #333;
-        }
-        tr:nth-child(even) {
-            background-color: #222;
-        }
-        .spacer {
-            margin: 40px 0; /* Espacement entre sections */
-        }
-        .chart-container {
-            margin: 20px auto;
-            padding: 10px;
-            border: 2px solid white; /* Bordure blanche */
-            width: 60%;
-            height: 300px;
-        }
-        button {
-            background-color: #444;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: #666;
-        }
-    </style>
+    <!-- Inclure le fichier CSS externe -->
+    <link rel="stylesheet" href="styles.css">
 </head>
+<body>
+</body>
+</html>

@@ -1,5 +1,5 @@
 body {
-    background-color: black; /* Fond noir */
+    background-color: #121212; /* Fond noir */
     color: white; /* Couleur du texte en blanc pour la visibilité */
     font-family: Arial, sans-serif; /* Choix de la police */
     margin: 0; /* Enlève les marges par défaut */
@@ -22,7 +22,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #1e1e1e;
+    background-color: #121212;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.8); /* Ombre autour du formulaire */
