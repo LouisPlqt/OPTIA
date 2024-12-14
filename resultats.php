@@ -135,12 +135,26 @@ try {
         <h1>Résultats de la recherche</h1>
 
         <?php
+                // --- AJOUT : Redirection directe si les 3 critères sont remplis et qu'un seul résultat existe ---
+        if (count($results) === 1 && !empty($modele) && !empty($ressource) && !empty($tache)) {
+            $idModele = $results[0]['IdModeleIA']; // Récupérer l'ID du modèle
+            header("Location: details.php?id=$idModele"); // Rediriger vers la page de détails
+            exit; // Stopper l'exécution après la redirection
+        }
         if (count($results) > 0) {
+            // Identifier si tous les critères sont remplis
+            if (!empty($modele) && !empty($ressource) && !empty($tache)) { // AJOUTÉE
+                echo "<h3>Modèle recherché : " . htmlspecialchars($modele) . "</h3>";
+                echo "<h3>Ressource : " . htmlspecialchars($ressource) . "</h3>";
+                echo "<h3>Tâche : " . htmlspecialchars($tache) . "</h3>";
+                echo "<h3>Voici les détails correspondants :</h3>";
+            }
             // Afficher un titre spécifique si la recherche est uniquement par modèle
             if (!empty($modele) && empty($ressource)) {
                 echo "<h2>Modèle recherché : " . htmlspecialchars($modele) . "</h2>";
                 echo "<h3>Voici les ressources capables de faire tourner le modèle :</h3>";
             }
+
 
             // Afficher un titre spécifique si la recherche est uniquement par ressource
             if (!empty($ressource) && empty($modele) && empty($tache)) {
