@@ -2,53 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recherche sur OptIA</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        // Fonction pour charger dynamiquement les suggestions
-        function fetchSuggestions(type) {
-            const input = document.getElementById(type).value;
-
-            if (input.length > 1) { // Charger si l'utilisateur tape au moins 2 caractères
-                fetch(`suggestions.php?type=${type}&query=${input}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const datalist = document.getElementById(type + '_list');
-                        datalist.innerHTML = ''; // Réinitialiser les suggestions
-                        data.forEach(item => {
-                            const option = document.createElement('option');
-                            option.value = item;
-                            datalist.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Erreur lors du chargement des suggestions:', error));
-            }
-
-            // Si l'utilisateur entre un modèle, remplir automatiquement la case "Tâche"
-            if (type === 'modele' && input.length > 1) {
-                fetchTaskForModel(input);
-            }
-        }
-
-        // Fonction pour récupérer la tâche associée au modèle
-        function fetchTaskForModel(modelName) {
-            fetch(`get_task_for_model.php?model=${modelName}`)
-                .then(response => response.json())
-                .then(data => {
-                    const taskField = document.getElementById('tache');
-                    if (data && data.task) {
-                        // Remplir la case "Tâche" avec la tâche correspondante
-                        taskField.value = data.task;
-                    } else {
-                        // Laisser la case "Tâche" vide si aucune tâche n'est trouvée
-                        taskField.value = '';
-                    }
-                })
-                .catch(error => console.error('Erreur lors de la récupération de la tâche :', error));
-        }
-    </script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Recherche sur OptIA</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <header>
@@ -90,5 +47,85 @@
             <button type="submit" class="search-button">Rechercher</button>
         </form>
     </div>
+    <div id="org-popup" class="active">
+        <h3>Votre organisation</h3>
+        <form id="org-form">
+            <input type="text" name="organisation" id="organisation" placeholder="Entrez le nom" required>
+            <button type="submit">Envoyer</button>
+        </form>
+        <div id="org-message"></div>
+    </div>
+
+    
+        
+        <script>
+            // Fonction pour charger dynamiquement les suggestions
+            function fetchSuggestions(type) {
+                const input = document.getElementById(type).value;
+    
+                if (input.length > 1) { // Charger si l'utilisateur tape au moins 2 caractères
+                    fetch(`suggestions.php?type=${type}&query=${input}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const datalist = document.getElementById(type + '_list');
+                            datalist.innerHTML = ''; // Réinitialiser les suggestions
+                            data.forEach(item => {
+                                const option = document.createElement('option');
+                                option.value = item;
+                                datalist.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Erreur lors du chargement des suggestions:', error));
+                }
+    
+                // Si l'utilisateur entre un modèle, remplir automatiquement la case "Tâche"
+                if (type === 'modele' && input.length > 1) {
+                    fetchTaskForModel(input);
+                }
+            }
+    
+            // Fonction pour récupérer la tâche associée au modèle
+            function fetchTaskForModel(modelName) {
+                fetch(`get_task_for_model.php?model=${modelName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const taskField = document.getElementById('tache');
+                        if (data && data.task) {
+                            // Remplir la case "Tâche" avec la tâche correspondante
+                            taskField.value = data.task;
+                        } else {
+                            // Laisser la case "Tâche" vide si aucune tâche n'est trouvée
+                            taskField.value = '';
+                        }
+                    })
+                    .catch(error => console.error('Erreur lors de la récupération de la tâche :', error));
+            }
+    
+            document.getElementById('org-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const orgName = document.getElementById('organisation').value;
+                const messageElement = document.getElementById('org-message');
+    
+                const response = await fetch('submit.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ organisation: orgName })
+                });
+    
+                if (response.ok) {
+                    messageElement.style.color = 'green';
+                    messageElement.textContent = "Votre réponse a été enregistrée avec succès.";
+                    setTimeout(() => {
+                        document.getElementById('org-popup').classList.remove('active');
+                    }, 2000); // La fenêtre disparaît après 2 secondes
+                } else {
+                    messageElement.style.color = 'red';
+                    messageElement.textContent = "Une erreur est survenue. Veuillez réessayer.";
+                }
+            });
+    
+            
+        </script>
+    
 </body>
 </html>

@@ -92,3 +92,30 @@ body {
     height: 40px;
     border-radius: 50%;
 }
+
+#org-popup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    display: none;
+}
+#org-popup.active {
+    display: block;
+}
+#org-popup button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+#org-popup button:hover {
+    background-color: #45a049;
+}
