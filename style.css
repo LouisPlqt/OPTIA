@@ -98,24 +98,66 @@ body {
     bottom: 20px;
     right: 20px;
     width: 300px;
-    background: #f9f9f9;
-    border: 1px solid #ccc;
+    background: #333; /* Couleur de fond sombre pour s'accorder avec le thème */
+    border: 1px solid #444; /* Bordure discrète */
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); /* Ombre subtile */
     padding: 15px;
     display: none;
+    z-index: 1000; /* S'assurer qu'elle soit au-dessus des autres éléments */
+    color: white; /* Couleur du texte en blanc */
 }
+
 #org-popup.active {
-    display: block;
+    display: block; /* Affiche la fenêtre quand elle est active */
 }
+
+#org-popup h3 {
+    margin: 0 0 10px; /* Ajoute un espace sous le titre */
+    font-size: 1.2rem;
+    color: #fff;
+    text-align: center;
+}
+
+#org-popup form {
+    display: flex;
+    flex-direction: column; /* Aligne les éléments du formulaire verticalement */
+}
+
+#org-popup input[type="text"] {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #666; /* Bordure discrète */
+    border-radius: 5px;
+    background-color: #444; /* Fond légèrement plus clair */
+    color: white; /* Couleur du texte */
+    margin-bottom: 10px;
+    box-sizing: border-box; /* Inclut le padding dans la largeur */
+}
+
+#org-popup input[type="text"]:focus {
+    outline: none;
+    border-color: #007BFF; /* Bordure bleue au focus */
+    background-color: #555; /* Fond plus clair au focus */
+}
+
 #org-popup button {
-    background-color: #4CAF50;
+    padding: 10px;
+    font-size: 1rem;
+    background-color: #007BFF; /* Couleur bleue en accord avec le bouton de recherche */
     color: white;
     border: none;
-    padding: 10px;
-    cursor: pointer;
     border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
+
 #org-popup button:hover {
-    background-color: #45a049;
+    background-color: #0056b3; /* Couleur bleue plus foncée au survol */
+}
+
+#org-message {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    text-align: center;
 }
