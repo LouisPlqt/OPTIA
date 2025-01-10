@@ -1,3 +1,6 @@
+
+
+
 <?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -10,8 +13,37 @@ try {
     die("Erreur de connexion : " . $e->getMessage());
 }
 
+$id = isset($_GET['id']) ? (int)$_GET['id'] : null; // ID du modèle
+    $idRessource = isset($_GET['ressource']) ? (int)$_GET['ressource'] : null;
+    $compression = isset($_GET['compression']) ? trim($_GET['compression']) : null;
+
+    // Si le type de compression est absent, demander à l'utilisateur
+    if (empty($compression)) {
+        echo "<div class='compression-container'>";
+        echo "<h2>Choisissez un type de compression pour afficher les détails :</h2>";
+        echo "<form method='GET' action='details.php'>";
+        echo "<input type='hidden' name='id' value='$id'>";
+        echo "<input type='hidden' name='ressource' value='$idRessource'>";
+        echo "<select name='compression' required>";
+        echo "<option value=''>-- Sélectionnez un type --</option>";
+        echo "<option value='pruning'>Pruning</option>";
+        echo "<option value='kd'>Knowledge Distillation</option>";
+        echo "<option value='quantization'>Quantization</option>";
+        echo "</select>";
+        echo "<button type='submit'>Afficher les détails</button>";
+        echo "</form>";
+        // Ajout du bouton "Retour"
+        echo "<button onclick='history.back();' style='margin-top: 20px; background-color: #444; color: white; border: none; padding: 10px 20px; cursor: pointer;'>Retour</button>";
+
+        echo "</div>";
+        exit;
+    }
+
+
 if (isset($_GET['id'])) {
-    $id = (int)$_GET['id']; // ID du modèle (idModeleIA)
+
+    // Utilisation directe de la compression si fournie
+    echo "<h2>Compression sélectionnée : " . htmlspecialchars($compression) . "</h2>";
 
     // Requête pour récupérer les détails du modèle
     $sql = "SELECT * FROM modeleia WHERE IdModeleIA = :id";
@@ -21,14 +53,45 @@ if (isset($_GET['id'])) {
     $modele = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($modele) {
-       // Bouton retour en haut à droite
+        // Bouton retour en haut à droite
         echo "<button onclick='window.history.back();' style='position: fixed; top: 10px; right: 10px; background-color: #444; color: white; border: none; padding: 10px 20px; cursor: pointer;'>Retour</button>";
 
         echo "<div class='container'>";
         echo "<h2>Détails du Modèle</h2>";
         echo "<p><strong>Nom :</strong> " . htmlspecialchars($modele['Nom']) . "</p>";
 
-        // Requêtes pour les performances avant
+        // Requête pour récupérer la ressource associée
+        $sqlRessource = "SELECT r.* FROM ressourceutilisée r
+                         JOIN classressource cr ON r.idRessource = cr.idRessource
+                         WHERE cr.idModeleIA = :id";
+        $stmtRessource = $conn->prepare($sqlRessource);
+        $stmtRessource->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmtRessource->execute();
+        $ressource = $stmtRessource->fetch(PDO::FETCH_ASSOC);
+
+        // Requête spécifique au type de compression sélectionné
+        if ($compression === 'pruning') {
+            $sqlCompression = "SELECT p.Methode, p.Taux_de_compression, p.Type FROM class_pruning cp
+                               JOIN pruning p ON cp.idPruning = p.IdPruning
+                               WHERE cp.idModele = :id";
+        } elseif ($compression === 'kd') {
+            $sqlCompression = "SELECT k.Alpha, k.Température FROM class_kd ck
+                               JOIN kd k ON ck.idKD = k.idKD
+                               WHERE ck.idModele = :id";
+        } elseif ($compression === 'quantization') {
+            $sqlCompression = "SELECT q.Méthode AS Methode, q.Nombre_de_bits AS Bits FROM class_quantization cq
+                               JOIN quantization q ON cq.idQuantization = q.idQuantization
+                               WHERE cq.idModele = :id";
+        } else {
+            die("<p>Type de compression invalide.</p>");
+        }
+
+        $stmtCompression = $conn->prepare($sqlCompression);
+        $stmtCompression->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmtCompression->execute();
+        $compressionDetails = $stmtCompression->fetchAll(PDO::FETCH_ASSOC);
+
+        // Afficher les détails des performances avant et après
         $sqlPerfBefore = "SELECT pb.* 
                           FROM perfbefore pb
                           JOIN classressource cr ON pb.idRessource = cr.idRessource
@@ -38,68 +101,38 @@ if (isset($_GET['id'])) {
         $stmtBefore->execute();
         $perfBefore = $stmtBefore->fetchAll(PDO::FETCH_ASSOC);
 
-        // Requêtes pour les performances après
         $sqlPerfAfter = "SELECT pa.* 
                          FROM perfafter pa
                          JOIN classperfafter cpa ON pa.idPerfAfter = cpa.idPerfAfter
-                         JOIN ressourceutilisée ru ON cpa.idRessource = ru.idRessource
                          WHERE pa.idModeleIA = :id";
         $stmtAfter = $conn->prepare($sqlPerfAfter);
         $stmtAfter->bindValue(':id', $id, PDO::PARAM_INT);
         $stmtAfter->execute();
         $perfAfter = $stmtAfter->fetchAll(PDO::FETCH_ASSOC);
 
-        // Afficher les détails des performances avant
-        if (!empty($perfBefore)) {
-            echo "<h3>Performances Avant</h3>";
+        if (!empty($compressionDetails)) {
+            echo "<h3>Détails pour la compression : " . htmlspecialchars($compression) . "</h3>";
             echo "<table>";
             echo "<thead><tr>";
-            foreach (array_keys($perfBefore[0]) as $column) {
-                if (!in_array($column, ['idPerfBefore', 'idRessource'])) { // Exclure les ID
-                    echo "<th>" . htmlspecialchars($column) . "</th>";
-                }
+            foreach (array_keys($compressionDetails[0]) as $column) {
+                echo "<th>" . htmlspecialchars($column) . "</th>";
             }
             echo "</tr></thead><tbody>";
-            foreach ($perfBefore as $row) {
+            foreach ($compressionDetails as $row) {
                 echo "<tr>";
-                foreach ($row as $key => $value) {
-                    if (!in_array($key, ['idPerfBefore', 'idRessource'])) { // Exclure les ID
-                        echo "<td>" . htmlspecialchars($value) . "</td>";
-                    }
+                foreach ($row as $value) {
+                    echo "<td>" . htmlspecialchars($value) . "</td>";
                 }
                 echo "</tr>";
             }
             echo "</tbody></table>";
+        } else {
+            echo "<p>Aucun détail trouvé pour ce type de compression.</p>";
         }
 
         echo "<div class='spacer'></div>";
 
-        // Afficher les détails des performances après
-        if (!empty($perfAfter)) {
-            echo "<h3>Performances Après</h3>";
-            echo "<table>";
-            echo "<thead><tr>";
-            foreach (array_keys($perfAfter[0]) as $column) {
-                if (!in_array($column, ['idPerfAfter', 'idModeleIA'])) { // Exclure les ID
-                    echo "<th>" . htmlspecialchars($column) . "</th>";
-                }
-            }
-            echo "</tr></thead><tbody>";
-            foreach ($perfAfter as $row) {
-                echo "<tr>";
-                foreach ($row as $key => $value) {
-                    if (!in_array($key, ['idPerfAfter', 'idModeleIA'])) { // Exclure les ID
-                        echo "<td>" . htmlspecialchars($value) . "</td>";
-                    }
-                }
-                echo "</tr>";
-            }
-            echo "</tbody></table>";
-        }
-
-        echo "<div class='spacer'></div>";
-
-        // Création des graphiques pour chaque métrique
+        // Comparer les performances avant et après avec des graphiques
         $categories = ['FPS', 'Utilisation_mémoire', 'Emission_CO2', 'Précision', 'Taille', 'FLOP'];
         foreach ($categories as $metric) {
             $valueBefore = !empty($perfBefore[0][$metric]) ? $perfBefore[0][$metric] : 0;
@@ -146,7 +179,6 @@ if (isset($_GET['id'])) {
     echo "<p>Erreur : ID non spécifié.</p>";
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -154,8 +186,9 @@ if (isset($_GET['id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Détails du Modèle</title>
     <!-- Inclure le fichier CSS externe -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 </body>
 </html>
+

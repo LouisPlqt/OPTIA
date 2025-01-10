@@ -43,10 +43,21 @@
                        oninput="fetchSuggestions('tache')">
                 <datalist id="tache_list"></datalist>
             </div>
+
+            <div class="form-group">
+                <label for="compression">Type de compression :</label>
+                <select name="compression" id="compression" class="search-input">
+                    <option value="">-- Choisissez un type de compression --</option>
+                    <option value="pruning">Pruning</option>
+                    <option value="kd">Knowledge Distillation</option>
+                    <option value="quantization">Quantization</option>
+                </select>
+            </div>
             
             <button type="submit" class="search-button">Rechercher</button>
         </form>
     </div>
+
     <div id="org-popup" class="active">
         <button id="close-popup" class="close-button">&times;</button>
         <h3>Première visite sur notre site ?</h3>

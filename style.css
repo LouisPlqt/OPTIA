@@ -1,15 +1,27 @@
+/* Styles généraux */
 body {
+    font-family: Arial, sans-serif;
     background-color: #121212; /* Fond noir */
-    color: white; /* Couleur du texte en blanc pour la visibilité */
-    font-family: Arial, sans-serif; /* Choix de la police */
-    margin: 0; /* Enlève les marges par défaut */
-    padding: 20px; /* Ajoute un peu de rembourrage autour du contenu */
+    color: white; /* Texte blanc */
+    margin: 0;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* Titre centré */
+h1, h2 {
+    text-align: center;
+    color: white;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+}
+
+/* Titres */
 .centered-title {
     text-align: center;
     font-size: 2.5rem;
@@ -17,12 +29,12 @@ body {
 }
 
 /* Conteneur de recherche */
-.search-container {
+.search-container, .compression-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #121212;
+    background-color: #1e1e1e; /* Fond légèrement différent */
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
@@ -31,14 +43,16 @@ body {
     max-width: 600px;
 }
 
-.search-container label, .search-container input {
+.search-container label, 
+.search-container input, 
+.compression-container select {
     margin-bottom: 15px;
 }
 
-.search-input {
+.search-input, .compression-container select {
     padding: 10px;
     font-size: 1rem;
-    border: 1px solid #ccc;
+    border: 1px solid #444;
     border-radius: 5px;
     background-color: #333;
     color: white;
@@ -46,13 +60,15 @@ body {
     box-sizing: border-box;
 }
 
-.search-input:focus {
+.search-input:focus, 
+.compression-container select:focus {
     outline: none;
     border-color: #007BFF;
     background-color: #444;
 }
 
-.search-button {
+/* Boutons */
+.search-button, .compression-container button {
     padding: 10px 20px;
     font-size: 1rem;
     background-color: #007BFF;
@@ -62,19 +78,21 @@ body {
     cursor: pointer;
     width: 100%;
     box-sizing: border-box;
+    transition: background-color 0.3s ease;
 }
 
-.search-button:hover {
+.search-button:hover, 
+.compression-container button:hover {
     background-color: #0056b3;
 }
 
-/* Logo positionné en haut à gauche */
+/* Logo */
 .logo {
     position: absolute;
     top: 20px;
     left: 20px;
     width: 180px;
-    height: auto; /* Garder les proportions */
+    height: auto;
 }
 
 /* Icône de profil */
@@ -90,6 +108,7 @@ body {
     height: 40px;
     border-radius: 50%;
 }
+
 
 /* Pop-up */
 #org-popup {
@@ -187,4 +206,48 @@ body {
 
 #close-popup:hover {
     color: #ff6666;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #1e1e1e;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+}
+
+table th, table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+table thead tr {
+    background-color: #2c2c2c;
+}
+
+table tbody tr:nth-of-type(even) {
+    background-color: #2c2c2c;
+}
+
+table tbody tr:hover {
+    background-color: #007BFF;
+    color: #121212;
+    transition: background-color 0.3s ease;
+}
+
+/* Espacement entre sections */
+.spacer {
+    margin: 40px 0;
+}
+
+/* Graphiques */
+.chart-container {
+    margin: 20px auto;
+    padding: 10px;
+    border: 2px solid white;
+    width: 60%;
+    height: 300px;
 }

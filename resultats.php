@@ -14,8 +14,36 @@ try {
 $modele = isset($_GET['modele']) ? trim($_GET['modele']) : '';
 $ressource = isset($_GET['ressource']) ? trim($_GET['ressource']) : '';
 $tache = isset($_GET['tache']) ? trim($_GET['tache']) : '';
+$compression = isset($_GET['compression']) ? trim($_GET['compression']) : '';
 
-// Construction de la requête SQL en fonction des critères renseignés
+// Initialisation de la requête SQL
+$sql = "SELECT m.IdModeleIA, m.Nom AS Modele, r.idRessource, r.Nom AS Ressource, t.Nom AS Tache, r.CPU, r.GPU, r.Mémoire";
+
+if ($compression === 'pruning') {
+    $sql .= ", p.Methode AS Methode, p.Taux_de_compression AS Taux, p.Type AS Type";
+} elseif ($compression === 'kd') {
+    $sql .= ", k.Alpha AS Alpha, k.Température AS Temp";
+} elseif ($compression === 'quantization') {
+    $sql .= ", q.Méthode AS MethodeQuant, q.Nombre_de_bits AS Bits";
+}
+
+$sql .= " FROM modeleia m
+          LEFT JOIN tache t ON m.id_tache = t.id_tache
+          LEFT JOIN classressource cr ON m.IdModeleIA = cr.idModeleIA
+          LEFT JOIN ressourceutilisée r ON cr.idRessource = r.idRessource";
+
+if ($compression === 'pruning') {
+    $sql .= " LEFT JOIN class_pruning cp ON m.IdModeleIA = cp.idModele
+               LEFT JOIN pruning p ON cp.idPruning = p.IdPruning";
+} elseif ($compression === 'kd') {
+    $sql .= " LEFT JOIN class_kd ck ON m.IdModeleIA = ck.idModele
+               LEFT JOIN kd k ON ck.idKD = k.idKD";
+} elseif ($compression === 'quantization') {
+    $sql .= " LEFT JOIN class_quantization cq ON m.IdModeleIA = cq.idModele
+               LEFT JOIN quantization q ON cq.idQuantization = q.idQuantization";
+}
+
+// Conditions dynamiques
 $conditions = [];
 $params = [];
 
@@ -34,13 +62,19 @@ if ($tache !== '') {
     $params[':tache'] = '%' . $tache . '%';
 }
 
+if ($compression !== '') {
+    if ($compression === 'pruning') {
+        $conditions[] = "p.Methode IS NOT NULL";
+    } elseif ($compression === 'kd') {
+        $conditions[] = "k.Alpha IS NOT NULL";
+    } elseif ($compression === 'quantization') {
+        $conditions[] = "q.Méthode IS NOT NULL";
+    }
+}
+
+// Ajout des conditions WHERE
 if (count($conditions) > 0) {
-    $sql = "SELECT m.IdModeleIA, m.Nom AS Modele, r.idRessource, r.Nom AS Ressource, t.Nom AS Tache, r.CPU, r.GPU, r.Mémoire
-            FROM modeleia m
-            LEFT JOIN tache t ON m.id_tache = t.id_tache
-            LEFT JOIN classressource cr ON m.IdModeleIA = cr.idModeleIA
-            LEFT JOIN ressourceutilisée r ON cr.idRessource = r.idRessource
-            WHERE " . implode(' AND ', $conditions);
+    $sql .= " WHERE " . implode(' AND ', $conditions);
 } else {
     die("<p>Veuillez renseigner au moins un critère de recherche.</p>");
 }
@@ -62,11 +96,11 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Résultats de la recherche</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
     <style>
         body {
-            background-color: #121212; /* Fond sombre */
-            color: #ffffff; /* Texte blanc */
+            background-color: #121212;
+            color: #ffffff;
             font-family: 'Roboto', sans-serif;
         }
 
@@ -77,7 +111,7 @@ try {
         }
 
         h1, h2, h3 {
-            color:rgb(255, 255, 255); /* Titre de couleur verte */
+            color: rgb(255, 255, 255);
         }
 
         table {
@@ -105,7 +139,7 @@ try {
         }
 
         a {
-            color:rgb(255, 255, 255);
+            color: rgb(255, 255, 255);
             text-decoration: none;
         }
 
@@ -135,46 +169,13 @@ try {
         <h1>Résultats de la recherche</h1>
 
         <?php
-                // --- AJOUT : Redirection directe si les 3 critères sont remplis et qu'un seul résultat existe ---
         if (count($results) === 1 && !empty($modele) && !empty($ressource) && !empty($tache)) {
-            $idModele = $results[0]['IdModeleIA']; // Récupérer l'ID du modèle
-            header("Location: details.php?id=$idModele"); // Rediriger vers la page de détails
-            exit; // Stopper l'exécution après la redirection
+            $idModele = $results[0]['IdModeleIA'];
+            header("Location: details.php?id=$idModele");
+            exit;
         }
+
         if (count($results) > 0) {
-            // Identifier si tous les critères sont remplis
-            if (!empty($modele) && !empty($ressource) && !empty($tache)) { // AJOUTÉE
-                echo "<h3>Modèle recherché : " . htmlspecialchars($modele) . "</h3>";
-                echo "<h3>Ressource : " . htmlspecialchars($ressource) . "</h3>";
-                echo "<h3>Tâche : " . htmlspecialchars($tache) . "</h3>";
-                echo "<h3>Voici les détails correspondants :</h3>";
-            }
-            // Afficher un titre spécifique si la recherche est uniquement par modèle
-            if (!empty($modele) && empty($ressource)) {
-                echo "<h2>Modèle recherché : " . htmlspecialchars($modele) . "</h2>";
-                echo "<h3>Voici les ressources capables de faire tourner le modèle :</h3>";
-            }
-
-
-            // Afficher un titre spécifique si la recherche est uniquement par ressource
-            if (!empty($ressource) && empty($modele) && empty($tache)) {
-                echo "<h2>Ressource recherchée : " . htmlspecialchars($ressource) . "</h2>";
-                echo "<h3>Voici les modèles pouvant être exécutés sur la ressource entrée :</h3>";
-            }
-
-            // Afficher un titre spécifique si la recherche combine ressource et tâche
-            if (!empty($ressource) && !empty($tache) && empty($modele)) {
-                echo "<h2>Ressource recherchée : " . htmlspecialchars($ressource) . "</h2>";
-                echo "<h2>Tâche recherchée : " . htmlspecialchars($tache) . "</h2>";
-                echo "<h3>Voici les modèles compatibles avec la tâche et la ressource spécifiées :</h3>";
-            }
-
-            // Afficher un titre spécifique si la recherche est uniquement par tâche
-            if (!empty($tache) && empty($modele) && empty($ressource)) {
-                echo "<h2>Tâche recherchée : " . htmlspecialchars($tache) . "</h2>";
-                echo "<h3>Voici les modèles et les ressources associés à cette tâche :</h3>";
-            }
-
             echo "<table>";
             echo "<tr>";
 
@@ -188,25 +189,45 @@ try {
                 echo "<th>Tâche</th>";
             }
 
-            echo "<th>CPU</th><th>GPU</th><th>Mémoire</th>";
+            echo "<th>CPU (GHz)</th><th>GPU (Nombre de cœurs)</th><th>Mémoire (Go)</th>";
+
+            if ($compression === 'pruning') {
+                echo "<th>Méthode de Pruning</th><th>Taux de Compression</th><th>Type</th>";
+            } elseif ($compression === 'kd') {
+                echo "<th>Alpha</th><th>Température</th>";
+            } elseif ($compression === 'quantization') {
+                echo "<th>Méthode de Quantization</th><th>Nombre de Bits</th>";
+            }
+
             echo "</tr>";
 
             foreach ($results as $result) {
                 echo "<tr>";
                 if ($modele === '') {
-                    // Lien vers la page détails pour le modèle
-                    echo "<td><a href='details.php?id=" . htmlspecialchars($result['IdModeleIA']) . "'>" . htmlspecialchars($result['Modele']) . "</a></td>";
+                    echo "<td><a href='details.php?id=" . htmlspecialchars($result['IdModeleIA'] ?? '') . "&compression=" . urlencode($compression) . "'>" . htmlspecialchars($result['Modele'] ?? '') . "</a></td>";
                 }
                 if ($ressource === '') {
-                    // Lien vers la page détails pour la ressource
-                    echo "<td><a href='details.php?id=" . htmlspecialchars($result['idRessource']) . "'>" . htmlspecialchars($result['Ressource']) . "</a></td>";
+                    echo "<td><a href='details.php?id=" . htmlspecialchars($result['IdModeleIA'] ?? '') . "&ressource=" . htmlspecialchars($result['idRessource'] ?? '') . "&compression=" . urlencode($compression) . "'>" . htmlspecialchars($result['Ressource'] ?? '') . "</a></td>";
                 }
                 if ($tache === '') {
-                    echo "<td>" . htmlspecialchars($result['Tache']) . "</td>";
+                    echo "<td>" . htmlspecialchars($result['Tache'] ?? '') . "</td>";
                 }
-                echo "<td>" . htmlspecialchars($result['CPU']) . "</td>";
-                echo "<td>" . htmlspecialchars($result['GPU']) . "</td>";
-                echo "<td>" . htmlspecialchars($result['Mémoire']) . "</td>";
+                echo "<td>" . htmlspecialchars($result['CPU'] ?? '') . "</td>";
+                echo "<td>" . htmlspecialchars($result['GPU'] ?? '') . "</td>";
+                echo "<td>" . htmlspecialchars($result['Mémoire'] ?? '') . "</td>";
+
+                if ($compression === 'pruning') {
+                    echo "<td>" . htmlspecialchars($result['Methode'] ?? '') . "</td>";
+                    echo "<td>" . htmlspecialchars($result['Taux'] ?? '') . "</td>";
+                    echo "<td>" . htmlspecialchars($result['Type'] ?? '') . "</td>";
+                } elseif ($compression === 'kd') {
+                    echo "<td>" . htmlspecialchars($result['Alpha'] ?? '') . "</td>";
+                    echo "<td>" . htmlspecialchars($result['Temp'] ?? '') . "</td>";
+                } elseif ($compression === 'quantization') {
+                    echo "<td>" . htmlspecialchars($result['MethodeQuant'] ?? '') . "</td>";
+                    echo "<td>" . htmlspecialchars($result['Bits'] ?? '') . "</td>";
+                }
+
                 echo "</tr>";
             }
 
