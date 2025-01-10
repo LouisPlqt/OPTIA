@@ -48,13 +48,16 @@
         </form>
     </div>
     <div id="org-popup" class="active">
-        <h3>Votre organisation</h3>
+        <button id="close-popup" class="close-button">&times;</button>
+        <h3>Première visite sur notre site ?</h3>
+        <p class="popup-text">Voulez-vous bien nous renseigner sur votre organisation (École, entreprise, ...)?</p>
         <form id="org-form">
-            <input type="text" name="organisation" id="organisation" placeholder="Entrez le nom" required>
+            <input type="text" name="organisation" id="organisation" placeholder="Entrez le nom de votre organisation" required>
             <button type="submit">Envoyer</button>
         </form>
         <div id="org-message"></div>
     </div>
+    
 
     
         
@@ -123,6 +126,10 @@
                     messageElement.textContent = "Une erreur est survenue. Veuillez réessayer.";
                 }
             });
+
+            document.getElementById('close-popup').addEventListener('click', function() {
+            document.getElementById('org-popup').classList.remove('active');
+        });
     
             
         </script>

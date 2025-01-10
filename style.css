@@ -11,9 +11,9 @@ body {
 
 /* Titre centré */
 .centered-title {
-    text-align: center; /* Centre le texte horizontalement */
+    text-align: center;
     font-size: 2.5rem;
-    margin: 30px 0; /* Ajoute de l'espace autour du titre */
+    margin: 30px 0;
 }
 
 /* Conteneur de recherche */
@@ -25,15 +25,14 @@ body {
     background-color: #121212;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8); /* Ombre autour du formulaire */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
     margin-bottom: 30px;
     width: 100%;
     max-width: 600px;
 }
 
-/* Espacement entre les champs de recherche */
 .search-container label, .search-container input {
-    margin-bottom: 15px; /* Ajoute un espacement vertical entre les champs */
+    margin-bottom: 15px;
 }
 
 .search-input {
@@ -53,7 +52,6 @@ body {
     background-color: #444;
 }
 
-/* Bouton de recherche */
 .search-button {
     padding: 10px 20px;
     font-size: 1rem;
@@ -75,7 +73,7 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
-    width: 180px; /* Taille du logo */
+    width: 180px;
     height: auto; /* Garder les proportions */
 }
 
@@ -93,58 +91,68 @@ body {
     border-radius: 50%;
 }
 
+/* Pop-up */
 #org-popup {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 300px;
-    background: #333; /* Couleur de fond sombre pour s'accorder avec le thème */
-    border: 1px solid #444; /* Bordure discrète */
+    width: 350px; /* Ajuste la largeur */
+    background: #333;
+    border: 1px solid #444;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); /* Ombre subtile */
-    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+    padding: 20px;
     display: none;
-    z-index: 1000; /* S'assurer qu'elle soit au-dessus des autres éléments */
-    color: white; /* Couleur du texte en blanc */
+    z-index: 1000;
+    color: white;
+    box-sizing: border-box;
 }
 
 #org-popup.active {
-    display: block; /* Affiche la fenêtre quand elle est active */
+    display: block;
 }
 
 #org-popup h3 {
-    margin: 0 0 10px; /* Ajoute un espace sous le titre */
+    margin: 0;
+    padding-right: 25px; /* Évite le chevauchement avec la croix */
     font-size: 1.2rem;
-    color: #fff;
     text-align: center;
+}
+
+#org-popup .popup-text {
+    font-size: 0.9rem;
+    color: #ccc;
+    margin: 10px 0 15px;
+    text-align: center;
+    line-height: 1.5;
 }
 
 #org-popup form {
     display: flex;
-    flex-direction: column; /* Aligne les éléments du formulaire verticalement */
+    flex-direction: column;
 }
 
 #org-popup input[type="text"] {
     padding: 10px;
     font-size: 1rem;
-    border: 1px solid #666; /* Bordure discrète */
+    border: 1px solid #666;
     border-radius: 5px;
-    background-color: #444; /* Fond légèrement plus clair */
-    color: white; /* Couleur du texte */
+    background-color: #444;
+    color: white;
     margin-bottom: 10px;
-    box-sizing: border-box; /* Inclut le padding dans la largeur */
+    box-sizing: border-box;
 }
 
 #org-popup input[type="text"]:focus {
     outline: none;
-    border-color: #007BFF; /* Bordure bleue au focus */
-    background-color: #555; /* Fond plus clair au focus */
+    border-color: #007BFF;
+    background-color: #555;
 }
 
 #org-popup button {
     padding: 10px;
     font-size: 1rem;
-    background-color: #007BFF; /* Couleur bleue en accord avec le bouton de recherche */
+    background-color: #007BFF;
     color: white;
     border: none;
     border-radius: 5px;
@@ -153,11 +161,30 @@ body {
 }
 
 #org-popup button:hover {
-    background-color: #0056b3; /* Couleur bleue plus foncée au survol */
+    background-color: #0056b3;
 }
 
 #org-message {
     margin-top: 10px;
     font-size: 0.9rem;
     text-align: center;
+}
+
+/* Bouton de fermeture */
+#close-popup {
+    position: absolute;
+    top: 5px; /* Position près du haut */
+    right: 10px; /* Position à droite */
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1rem; /* Taille plus petite */
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 1100; /* Assure que le bouton soit au-dessus */
+}
+
+#close-popup:hover {
+    color: #ff6666;
 }
